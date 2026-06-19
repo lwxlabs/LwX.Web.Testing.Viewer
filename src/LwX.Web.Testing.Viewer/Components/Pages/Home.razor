@@ -1,0 +1,139 @@
+@page "/"
+@inject TestReportReader Reader
+
+@if (_model is null)
+{
+    <div class="loading-card">Loading test results…</div>
+}
+else
+{
+    <section class="summary-grid">
+        <div class="metric-card"><span>Total tests</span><strong>@_model.TotalTests</strong></div>
+        <div class="metric-card good"><span>Passed</span><strong>@_model.PassedTests</strong></div>
+        <div class="metric-card danger"><span>Failed</span><strong>@_model.FailedTests</strong></div>
+        <div class="metric-card"><span>Artifacts</span><strong>@_model.TotalArtifacts</strong></div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Runs</h2>
+                <p>Structured reports from <code>run-summary.json</code>. If no report exists, the viewer still scans screenshots, traces, videos, HAR and logs.</p>
+            </div>
+            <button class="btn primary" @onclick="RefreshAsync">Refresh</button>
+        </div>
+
+        @if (_model.Runs.Count == 0)
+        {
+            <div class="empty-state">
+                <h3>No structured reports found</h3>
+                <p>Add <code>options.Report.Enabled = true</code> in LwX.Web.Testing, or drop existing Playwright artifacts into the results folder.</p>
+            </div>
+        }
+        else
+        {
+            <div class="run-list">
+                @foreach (var run in _model.Runs)
+                {
+                    <article class="run-card">
+                        <div class="run-title">
+                            <div>
+                                <h3>@run.Report.Framework · @run.Report.Browser</h3>
+                                <p>@run.Report.BaseUrl</p>
+                            </div>
+                            <span class="pill @RunPillClass(run)">@run.PassedTests passed / @run.FailedTests failed</span>
+                        </div>
+                        <div class="run-meta">
+                            <span>@run.Report.StartedAtUtc.LocalDateTime</span>
+                            <span>@run.Report.Profile</span>
+                            <span>@run.RelativeReportPath</span>
+                        </div>
+
+                        @foreach (var test in run.Tests)
+                        {
+                            <details class="test-card">
+                                <summary>
+                                    <span class="status @StatusClass(test.Status)">@test.Status</span>
+                                    <strong>@test.Name</strong>
+                                    <small>@test.DurationMs ms</small>
+                                </summary>
+                                @if (!string.IsNullOrWhiteSpace(test.ErrorMessage))
+                                {
+                                    <div class="error-box">@test.ErrorMessage</div>
+                                }
+
+                                @if (test.Steps.Count > 0)
+                                {
+                                    <h4>Steps</h4>
+                                    <div class="step-list">
+                                        @foreach (var step in test.Steps)
+                                        {
+                                            <div class="step-row">
+                                                <span class="status @StatusClass(step.Status)">@step.Status</span>
+                                                <span>@step.Name</span>
+                                                <small>@step.DurationMs ms</small>
+                                            </div>
+                                            <ArtifactStrip Artifacts="@step.Artifacts.Select(ToViewerArtifact).ToList()" />
+                                        }
+                                    </div>
+                                }
+
+                                <ArtifactStrip Artifacts="@test.Artifacts" />
+
+                                <div class="diagnostic-grid">
+                                    <DiagnosticPanel Title="Console" Items="@FormatConsole(test.Console)" />
+                                    <DiagnosticPanel Title="Network" Items="@FormatNetwork(test.Network)" />
+                                    <DiagnosticPanel Title="Framework" Items="@FormatFramework(test.FrameworkErrors)" />
+                                </div>
+                            </details>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="panel" id="artifacts">
+        <div class="panel-header">
+            <div>
+                <h2>Loose artifacts</h2>
+                <p>Detected without needing a report file. Useful for older test runs.</p>
+            </div>
+        </div>
+        <ArtifactStrip Artifacts="@_model.LooseArtifacts" Large="true" />
+    </section>
+}
+
+@code {
+    private ViewerDashboardModel? _model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _model = await Reader.LoadAsync();
+    }
+
+    private async Task RefreshAsync()
+    {
+        _model = await Reader.LoadAsync(forceRefresh: true);
+    }
+
+    private static string RunPillClass(ViewerRunModel run) => run.FailedTests > 0 ? "bad" : "ok";
+
+    private static string StatusClass(string status) => status.Equals("Passed", StringComparison.OrdinalIgnoreCase) ? "ok" : status.Equals("Failed", StringComparison.OrdinalIgnoreCase) ? "bad" : "neutral";
+
+    private static List<string> FormatConsole(IEnumerable<LwXConsoleReportEntry> entries) => entries.Select(x => $"[{x.Type}] {x.Text}").ToList();
+
+    private static List<string> FormatNetwork(IEnumerable<LwXNetworkReportEntry> entries) => entries.Select(x => $"{(x.StatusCode?.ToString() ?? "failed")} {x.Method} {x.Url} {x.Failure}").ToList();
+
+    private static List<string> FormatFramework(IEnumerable<LwXFrameworkReportEntry> entries) => entries.Select(x => $"[{x.Framework}] {x.Message}").ToList();
+
+    private static ViewerArtifactModel ToViewerArtifact(LwXArtifactReference x) => new()
+    {
+        Kind = x.Kind,
+        Name = x.Name,
+        RelativePath = x.RelativePath,
+        Url = "/artifacts/" + x.RelativePath,
+        ContentType = x.ContentType,
+        SizeBytes = x.SizeBytes
+    };
+}

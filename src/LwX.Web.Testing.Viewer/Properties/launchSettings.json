@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LwX.Web.Testing.Viewer": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:61503;http://localhost:61504"
+    }
+  }
+}

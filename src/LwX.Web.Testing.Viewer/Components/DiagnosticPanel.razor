@@ -1,0 +1,21 @@
+<div class="diag-panel">
+    <h4>@Title</h4>
+    @if (Items.Count == 0)
+    {
+        <p class="muted">No entries</p>
+    }
+    else
+    {
+        <div class="diag-list">
+            @foreach (var item in Items.Take(50))
+            {
+                <code>@item</code>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public List<string> Items { get; set; } = [];
+}

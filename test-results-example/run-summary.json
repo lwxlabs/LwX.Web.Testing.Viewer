@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0",
+  "runId": "example-run",
+  "startedAtUtc": "2026-06-09T20:00:00Z",
+  "finishedAtUtc": "2026-06-09T20:00:04Z",
+  "framework": "React",
+  "browser": "Chromium",
+  "profile": "CI",
+  "baseUrl": "http://localhost:5173",
+  "tests": [
+    {
+      "id": "editor-should-save",
+      "name": "Editor_Should_Save",
+      "status": "Failed",
+      "durationMs": 1842,
+      "errorMessage": "Expected text 'Saved' but it was not found.",
+      "steps": [
+        {
+          "name": "Open editor",
+          "status": "Passed",
+          "durationMs": 410,
+          "artifacts": []
+        },
+        {
+          "name": "Save",
+          "status": "Failed",
+          "durationMs": 820,
+          "errorMessage": "Save button did not respond.",
+          "artifacts": []
+        }
+      ],
+      "artifacts": [
+        {
+          "kind": "log",
+          "name": "diagnostics",
+          "relativePath": "logs/Editor_Should_Save.log",
+          "contentType": "text/plain"
+        }
+      ],
+      "console": [
+        { "type": "error", "text": "Cannot read properties of undefined" }
+      ],
+      "network": [
+        { "method": "POST", "url": "/api/files/save", "statusCode": 500 }
+      ],
+      "frameworkErrors": [
+        { "framework": "React", "message": "React error overlay detected", "severity": "error" }
+      ]
+    }
+  ],
+  "artifacts": []
+}

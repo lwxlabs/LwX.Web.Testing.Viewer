@@ -1,0 +1,43 @@
+@inherits LayoutComponentBase
+@inject ViewerOptions Options
+@inject IJSRuntime Js
+
+<div class="shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">LW</div>
+            <div>
+                <strong>LwX Viewer</strong>
+                <small>Web testing results</small>
+            </div>
+        </div>
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/#failures">Failures</a>
+            <a href="/#artifacts">Artifacts</a>
+            <a href="/how-to-use">How to use</a>
+        </nav>
+        <div class="sidebar-footer">
+            <small>Results folder</small>
+            <code>@Options.ResultsDirectory</code>
+        </div>
+    </aside>
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">Universal visual report viewer</span>
+                <h1>LwX.Web.Testing Viewer</h1>
+            </div>
+            <div class="toolbar">
+                <button class="btn" @onclick='() => SetTheme("dark")'>Dark</button>
+                <button class="btn" @onclick='() => SetTheme("light")'>Light</button>
+                <button class="btn" @onclick='() => SetTheme("auto")'>Auto</button>
+            </div>
+        </header>
+        @Body
+    </main>
+</div>
+
+@code {
+    private ValueTask SetTheme(string theme) => Js.InvokeVoidAsync("lwxViewer.setTheme", theme);
+}

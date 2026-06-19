@@ -1,0 +1,48 @@
+@if (Artifacts is { Count: > 0 })
+{
+    <div class="artifact-strip @LargeClass">
+        @foreach (var artifact in Artifacts)
+        {
+            <a class="artifact-card" href="@artifact.Url" target="_blank" title="@artifact.RelativePath">
+                @if (artifact.IsImage)
+                {
+                    <img src="@artifact.Url" alt="@artifact.Name" />
+                }
+                else if (artifact.IsVideo)
+                {
+                    <video src="@artifact.Url" controls muted></video>
+                }
+                else
+                {
+                    <div class="file-icon">@Icon(artifact)</div>
+                }
+                <div class="artifact-meta">
+                    <strong>@artifact.Name</strong>
+                    <span>@artifact.Kind · @FormatSize(artifact.SizeBytes)</span>
+                </div>
+            </a>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public List<ViewerArtifactModel> Artifacts { get; set; } = [];
+    [Parameter] public bool Large { get; set; }
+    private string LargeClass => Large ? "large" : string.Empty;
+
+    private static string Icon(ViewerArtifactModel artifact)
+    {
+        if (artifact.IsTrace) return "Trace";
+        if (artifact.IsHar) return "HAR";
+        if (artifact.IsLog) return "Log";
+        return "File";
+    }
+
+    private static string FormatSize(long? bytes)
+    {
+        if (bytes is null) return "unknown";
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024d:0.0} KB";
+        return $"{bytes / 1024d / 1024d:0.0} MB";
+    }
+}

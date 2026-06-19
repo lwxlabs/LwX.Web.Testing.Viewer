@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>lwx-test-viewer</ToolCommandName>
+    <PackageId>LwX.Web.Testing.Viewer</PackageId>
+    <Version>1.0.0-preview.1</Version>
+    <Authors>LwXLabs</Authors>
+    <Description>Optional visual local dashboard for LwX.Web.Testing reports, screenshots, traces, videos, HAR, console logs and network failures.</Description>
+    <PackageTags>playwright;testing;viewer;report;dashboard;e2e;blazor</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/LwXLabs/LwX.Web.Testing</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LwX.Web.Testing" Version="1.0.0-preview.1" />
+  </ItemGroup>
+</Project>

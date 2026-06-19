@@ -1,0 +1,44 @@
+@page "/how-to-use"
+
+<section class="panel docs-panel">
+    <h2>Use with LwX.Web.Testing</h2>
+    <p>Enable reports and artifacts in your test configuration:</p>
+
+<pre><code>protected override void Configure(LwXWebTestingOptions options)
+{
+    options.BaseUrl = "http://localhost:5173";
+    options.UseReact();
+    options.UseProfile(LwXTestProfile.CI);
+
+    options.Report.Enabled = true;
+    options.Report.OutputDirectory = "test-results";
+    options.Report.FileName = "run-summary.json";
+
+    options.Artifacts.ScreenshotOnFailure = true;
+    options.Artifacts.TraceOnFailure = true;
+    options.Artifacts.VideoOnFailure = true;
+    options.Logging.WriteToFile = true;
+
+    options.Steps.ScreenshotEachStep = true;
+}</code></pre>
+
+    <p>Use named steps to create a visual timeline:</p>
+
+<pre><code>[Fact]
+public async Task Editor_Should_Save()
+{
+    await RunSafelyAsync(async () =&gt;
+    {
+        await StepAsync("Open editor", () =&gt; GoToAsync("/editor"));
+        await StepAsync("Fill title", () =&gt; Page.FillByTestIdAsync("title", "Demo"));
+        await StepAsync("Save", () =&gt; Page.SaveShortcutAsync());
+        await Page.ShouldContainTextAsync("Saved");
+    }, "Editor_Should_Save");
+}</code></pre>
+
+    <p>Open the viewer:</p>
+
+<pre><code>dotnet run --project src/LwX.Web.Testing.Viewer -- --results ./test-results</code></pre>
+
+    <p>The viewer also scans loose Playwright artifacts when no <code>run-summary.json</code> exists.</p>
+</section>

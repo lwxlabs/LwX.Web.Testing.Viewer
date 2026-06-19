@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="css/viewer.css" />
+    <HeadOutlet />
+</head>
+<body>
+    <Routes />
+    <script src="_framework/blazor.web.js"></script>
+    <script>
+        window.lwxViewer = {
+            setTheme: function(theme){
+                if(theme === 'auto') document.documentElement.removeAttribute('data-theme');
+                else document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('lwx-viewer-theme', theme);
+            },
+            loadTheme: function(){
+                const theme = localStorage.getItem('lwx-viewer-theme') || 'dark';
+                window.lwxViewer.setTheme(theme);
+                return theme;
+            }
+        };
+        window.lwxViewer.loadTheme();
+    </script>
+</body>
+</html>
