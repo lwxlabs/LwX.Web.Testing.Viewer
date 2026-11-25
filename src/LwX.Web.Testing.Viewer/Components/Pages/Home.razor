@@ -1,3 +1,4 @@
+@inject LwX.Web.Testing.Viewer.Services.ArtifactIndexBuilder ArtifactIndex
 @page "/"
 @inject TestReportReader Reader
 
@@ -73,7 +74,7 @@ else
                                                 <span>@step.Name</span>
                                                 <small>@step.DurationMs ms</small>
                                             </div>
-                                            <ArtifactStrip Artifacts="@step.Artifacts.Select(ToViewerArtifact).ToList()" />
+                                            <ArtifactStrip Artifacts="@ArtifactIndex.FromReportArtifacts(_model.ResultsDirectory, step.Artifacts)" />
                                         }
                                     </div>
                                 }
@@ -127,13 +128,4 @@ else
 
     private static List<string> FormatFramework(IEnumerable<LwXFrameworkReportEntry> entries) => entries.Select(x => $"[{x.Framework}] {x.Message}").ToList();
 
-    private static ViewerArtifactModel ToViewerArtifact(LwXArtifactReference x) => new()
-    {
-        Kind = x.Kind,
-        Name = x.Name,
-        RelativePath = x.RelativePath,
-        Url = "/artifacts/" + x.RelativePath,
-        ContentType = x.ContentType,
-        SizeBytes = x.SizeBytes
-    };
 }

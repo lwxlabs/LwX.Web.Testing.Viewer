@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
@@ -12,14 +12,12 @@
     <PackageTags>playwright;testing;viewer;report;dashboard;e2e;blazor</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/LwXLabs/LwX.Web.Testing</RepositoryUrl>
+    <RepositoryUrl>https://github.com/lwxlabs/LwX.Web.Testing.Viewer</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="LwX.Web.Testing" Version="1.0.0-preview.1" />
-  </ItemGroup>
+
 </Project>

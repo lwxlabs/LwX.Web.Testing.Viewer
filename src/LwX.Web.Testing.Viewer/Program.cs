@@ -1,5 +1,6 @@
 using LwX.Web.Testing.Viewer.Services;
-using Microsoft.Extensions.FileProviders;
+using System.Net;
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,12 +24,28 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
-app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
+app.Use(async (context, next) =>
 {
-    FileProvider = new PhysicalFileProvider(resultsDirectory),
-    RequestPath = "/artifacts",
-    ServeUnknownFileTypes = true
+    var remote = context.Connection.RemoteIpAddress;
+    if (remote is null || !IPAddress.IsLoopback(remote.IsIPv4MappedToIPv6 ? remote.MapToIPv4() : remote) ||
+        !(context.Request.Host.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+          (IPAddress.TryParse(context.Request.Host.Host.Trim('[', ']'), out var host) && IPAddress.IsLoopback(host))))
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return;
+    }
+
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    await next();
+});
+
+app.UseStaticFiles();
+app.MapGet("/artifacts/{**path}", (string path, ViewerOptions options) =>
+{
+    if (!ArtifactIndexBuilder.TryResolveArtifact(options.ResultsDirectory, path, out var file, out var type))
+        return Results.NotFound();
+
+    return Results.File(file, type, enableRangeProcessing: true);
 });
 app.UseAntiforgery();
 

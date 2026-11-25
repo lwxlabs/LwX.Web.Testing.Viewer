@@ -28,7 +28,7 @@ public sealed class TestReportReader
         var model = new ViewerDashboardModel { ResultsDirectory = _options.ResultsDirectory };
         Directory.CreateDirectory(_options.ResultsDirectory);
 
-        var reports = Directory.EnumerateFiles(_options.ResultsDirectory, "run-summary.json", SearchOption.AllDirectories)
+        var reports = Directory.EnumerateFiles(_options.ResultsDirectory, "run-summary.json", new EnumerationOptions { RecurseSubdirectories = true, AttributesToSkip = FileAttributes.ReparsePoint, IgnoreInaccessible = true })
             .OrderByDescending(File.GetLastWriteTimeUtc)
             .ToList();
 
